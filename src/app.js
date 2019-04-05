@@ -16,11 +16,10 @@ function scrapeCard($, cardDiv) {
     id: $cardDiv.attr("data-id"),
     level: $cardDiv.find("#level").text(),
     components: $cardDiv
-      .find("#components > span")
-      .map(function() {
-        return $(this).text();
-      })
-      .get(),
+      .find("#components")
+      .attr('class')
+      .trim()
+      .split(' '),
     attributes: $cardDiv
       .find("dt")
       .map(function() {
@@ -64,9 +63,9 @@ function inferMetadata(card) {
       isUpcastable:
         desc.indexOf("when you cast this spell using a spell slot of ") > 0,
 
-      hasVerbalComponent: card.components.includes("V"),
-      hasSomaticComponent: card.components.includes("S"),
-      hasMaterialComponent: card.components.includes("M"),
+      hasVerbalComponent: card.components.includes("verbal"),
+      hasSomaticComponent: card.components.includes("somatic"),
+      hasMaterialComponent: card.components.includes("material"),
       hasMaterialGPCost:
         card.attributes["Materials"].toLowerCase().indexOf("worth") > 0
     }
