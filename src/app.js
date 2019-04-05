@@ -1,16 +1,23 @@
-const request = require("request-promise-native");
-const cheerio = require("cheerio");
-const fs = require("fs-extra");
-const path = require("path");
-const json2csv = require("json-csv");
+const request = require("request-promise-native"); // HTTP Request
+const cheerio = require("cheerio"); // Headless jQuery
+const fs = require("fs-extra"); // Read/Write to file system
+const path = require("path"); // Safely join path dirs
+const json2csv = require("json-csv"); // Convert array of json to csv format
 
 const jsonfile = path.join(__dirname, "../data/spells.json");
 const csvfile = path.join(__dirname, "../data/spells.csv");
 
+/**
+ * Extract spell data from DOM card elements
+ * 
+ * name, id, level, components, attributes, description
+ * 
+ * components: verbal, somatic, material
+ * attributes: Duration, Casting Time, School, Book, Materials
+ */
 function scrapeCard($, cardDiv) {
   const $cardDiv = $(cardDiv);
 
-  // Extract each of the pieces of the data from the DOM
   return {
     name: $cardDiv.find("#basics").text(),
     id: $cardDiv.attr("data-id"),
@@ -43,6 +50,13 @@ function scrapeCard($, cardDiv) {
   };
 }
 
+/**
+ * Extract useful 'snippets' of data to facilitate sorting & filtering
+ * 
+ * Is: Spell Attack, Spell Save, Ranged, Melee, Reaction, Bonus Action, Concentration, Upcastable
+ * Uses: Str, Dex, Con, Int, Wis, Cha, Bonus Action
+ * Has: Save for half damage, V, S, M, Material Cost
+ */
 function inferMetadata(card) {
   const desc = card.description.toLowerCase();
 
@@ -82,6 +96,9 @@ function inferMetadata(card) {
   };
 }
 
+/**
+ * Scrape raw data from the web, parse, then write to file
+ */
 function getFromWeb() {
   console.log("Scraping");
   return request({
@@ -109,6 +126,11 @@ function getFromWeb() {
     });
 }
 
+/**
+ * Read spells from JSON file (Written by getFromWeb())
+ * 
+ * Avoids thrashing the website
+ */
 const getFromDisk = () => {
   console.log("Reading from file ", jsonfile);
   return fs.readJson(jsonfile);
