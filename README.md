@@ -8,3 +8,4 @@
 - Standardize concentration durations (1 minute, 1 minutes, 1 minute.)
 - Add "repeat save" detection
 - Improve material cost detection (worth, consumed)
+- Write a simple react-app using a filterable datagrid with fast searching
