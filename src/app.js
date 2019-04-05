@@ -4,8 +4,8 @@ const fs = require("fs-extra");
 const path = require("path");
 const json2csv = require("json-csv");
 
-const jsonfile = path.join(__dirname, "spells.json");
-const csvfile = path.join(__dirname, "spells.csv");
+const jsonfile = path.join(__dirname, "../data/spells.json");
+const csvfile = path.join(__dirname, "../data/spells.csv");
 
 function scrapeCard($, cardDiv) {
   const $cardDiv = $(cardDiv);
@@ -114,8 +114,8 @@ const getFromDisk = () => {
   return fs.readJson(jsonfile);
 };
 
-// getFromWeb()
-getFromDisk()
+getFromWeb()
+// getFromDisk()
   .then(spells =>
     spells.map(spell => Object.assign({}, spell, inferMetadata(spell)))
   )
