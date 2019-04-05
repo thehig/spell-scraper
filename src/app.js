@@ -31,7 +31,10 @@ function scrapeCard($, cardDiv) {
           .trim();
         return { [key]: value };
       })
-      .get(),
+      .get()
+      .reduce((prev, next) => {
+        return Object.assign({}, prev, next);
+      }, {}),
     description: $cardDiv
       .find("#description-content")
       .text()
@@ -45,23 +48,25 @@ function inferMetadata(card) {
   return {
     meta: {
       isSpellAttack: desc.indexOf("spell attack") > 0,
+
       isSavingThrow: desc.indexOf("saving throw") > 0,
       hasHalfDamage: desc.indexOf("or half as much") > 0,
-
+      // isRitual - Not in dataset
       isReaction:
         card.attributes["Casting Time"].toLowerCase().indexOf("reaction") > 0,
       isBonus:
         card.attributes["Casting Time"].toLowerCase().indexOf("bonus") > 0,
-
+      usesBonus: desc.indexOf("bonus") > 0,
       isConcentration:
         card.attributes["Duration"].toLowerCase().indexOf("concentration") > 0,
-      // // isRitual - Not in dataset
       isUpcastable:
         desc.indexOf("when you cast this spell using a spell slot of ") > 0,
 
       hasVerbalComponent: card.components.includes("V"),
       hasSomaticComponent: card.components.includes("S"),
-      hasMaterialComponent: card.components.includes("M")
+      hasMaterialComponent: card.components.includes("M"),
+      hasMaterialGPCost:
+        card.attributes["Materials"].toLowerCase().indexOf("worth") > 0
     }
   };
 }
@@ -98,12 +103,14 @@ const getFromDisk = () => {
   return fs.readJson(jsonfile);
 };
 
-getFromWeb()
+// getFromWeb()
+getFromDisk()
   .then(spells =>
     spells.map(spell => Object.assign({}, spell, inferMetadata(spell)))
   )
   .then(spells => {
     console.log("spells", spells);
+    debugger;
   })
   .catch(function(err) {
     console.log(err);
