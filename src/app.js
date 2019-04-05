@@ -2,7 +2,7 @@ const request = require("request-promise-native");
 const cheerio = require("cheerio");
 const fs = require("fs-extra");
 const path = require("path");
-const converter = require("json-2-csv");
+const json2csv = require("json-csv");
 
 const jsonfile = path.join(__dirname, "spells.json");
 const csvfile = path.join(__dirname, "spells.csv");
@@ -17,9 +17,9 @@ function scrapeCard($, cardDiv) {
     level: $cardDiv.find("#level").text(),
     components: $cardDiv
       .find("#components")
-      .attr('class')
+      .attr("class")
       .trim()
-      .split(' '),
+      .split(" "),
     attributes: $cardDiv
       .find("dt")
       .map(function() {
@@ -53,7 +53,7 @@ function inferMetadata(card) {
 
       isRanged: desc.indexOf("ranged") >= 0,
       isMelee: desc.indexOf("melee") >= 0,
-      
+
       usesStr: desc.indexOf("strength") >= 0,
       usesDex: desc.indexOf("dexterity") >= 0,
       usesCon: desc.indexOf("constitution") >= 0,
@@ -121,10 +121,52 @@ getFromDisk()
   )
   .then(spells => {
     console.log("Converting to CSV");
-    return converter.json2csvAsync(spells);
+
+    return new Promise((resolve, reject) => {
+      json2csv.csvBuffered(
+        spells,
+        {
+          fields: [
+            { name: "name", label: "Name", quoted: true },
+            { name: "description", label: "Description", quoted: true },
+            { name: "level", label: "Level" },
+            { name: "attributes.Book", label: "Book", quoted: true },
+            { name: "attributes.School", label: "School", quoted: true },
+            { name: "meta.hasVerbalComponent", label: "V" },
+            { name: "meta.hasSomaticComponent", label: "S" },
+            { name: "meta.hasMaterialComponent", label: "M" },
+            { name: "meta.hasMaterialGPCost", label: "$" },
+            { name: "attributes.Materials", label: "Materials" },
+            {
+              name: "attributes.Casting Time",
+              label: "Casting Time",
+              quoted: true
+            },
+            { name: "meta.isReaction", label: "R" },
+            { name: "meta.isBonus", label: "B" },
+            { name: "meta.usesBonus", label: "B?" },
+            { name: "attributes.Duration", label: "Duration", quoted: true },
+            { name: "meta.isConcentration", label: "C" },
+            { name: "meta.isUpcastable", label: "Upcast" },
+            { name: "meta.isSpellAttack", label: "Spell Atk" },
+            { name: "meta.isRanged", label: "Ranged" },
+            { name: "meta.isMelee", label: "Melee" },
+            { name: "meta.isSavingThrow", label: "Spell Sav" },
+            { name: "meta.hasHalfDamage", label: "1/2 Dmg" },
+            { name: "meta.usesStr", label: "Str" },
+            { name: "meta.usesDex", label: "Dex" },
+            { name: "meta.usesCon", label: "Con" },
+            { name: "meta.usesInt", label: "Int" },
+            { name: "meta.usesWis", label: "Wis" },
+            { name: "meta.usesCha", label: "Cha" }
+          ]
+        },
+        (err, csv) => (err ? reject(err) : resolve(csv))
+      );
+    });
   })
   .then(csv => {
-    console.log('Writing CSV to file', csvfile);
+    console.log("Writing CSV to file", csvfile);
     return fs.outputFile(csvfile, csv);
   })
   .catch(function(err) {
