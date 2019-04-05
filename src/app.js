@@ -31,8 +31,7 @@ function scrapeCard($, cardDiv) {
           .trim();
         return { [key]: value };
       })
-      .get()
-      .reduce((prev, next) => Object.assign({}, prev, next), {}),
+      .get(),
     description: $cardDiv
       .find("#description-content")
       .text()
