@@ -2,14 +2,16 @@
   "name": "spell-scraper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
+    "fs-extra": "^7.0.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
