@@ -2,8 +2,10 @@ const request = require("request-promise-native");
 const cheerio = require("cheerio");
 const fs = require("fs-extra");
 const path = require("path");
+const converter = require("json-2-csv");
 
 const jsonfile = path.join(__dirname, "spells.json");
+const csvfile = path.join(__dirname, "spells.csv");
 
 function scrapeCard($, cardDiv) {
   const $cardDiv = $(cardDiv);
@@ -109,8 +111,12 @@ getFromDisk()
     spells.map(spell => Object.assign({}, spell, inferMetadata(spell)))
   )
   .then(spells => {
-    console.log("spells", spells);
-    debugger;
+    console.log("Converting to CSV");
+    return converter.json2csvAsync(spells);
+  })
+  .then(csv => {
+    console.log('Writing CSV to file', csvfile);
+    return fs.outputFile(csvfile, csv);
   })
   .catch(function(err) {
     console.log(err);
