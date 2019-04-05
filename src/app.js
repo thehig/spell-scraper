@@ -48,26 +48,36 @@ function inferMetadata(card) {
 
   return {
     meta: {
-      isSpellAttack: desc.indexOf("spell attack") > 0,
+      isSpellAttack: desc.indexOf("spell attack") >= 0,
+      isSavingThrow: desc.indexOf("saving throw") >= 0,
 
-      isSavingThrow: desc.indexOf("saving throw") > 0,
-      hasHalfDamage: desc.indexOf("or half as much") > 0,
+      isRanged: desc.indexOf("ranged") >= 0,
+      isMelee: desc.indexOf("melee") >= 0,
+      
+      usesStr: desc.indexOf("strength") >= 0,
+      usesDex: desc.indexOf("dexterity") >= 0,
+      usesCon: desc.indexOf("constitution") >= 0,
+      usesInt: desc.indexOf("intelligence") >= 0,
+      usesWis: desc.indexOf("wisdom") >= 0,
+      usesCha: desc.indexOf("charisma") >= 0,
+
+      hasHalfDamage: desc.indexOf("or half as much") >= 0,
       // isRitual - Not in dataset
       isReaction:
-        card.attributes["Casting Time"].toLowerCase().indexOf("reaction") > 0,
+        card.attributes["Casting Time"].toLowerCase().indexOf("reaction") >= 0,
       isBonus:
-        card.attributes["Casting Time"].toLowerCase().indexOf("bonus") > 0,
-      usesBonus: desc.indexOf("bonus") > 0,
+        card.attributes["Casting Time"].toLowerCase().indexOf("bonus") >= 0,
+      usesBonus: desc.indexOf("bonus") >= 0,
       isConcentration:
-        card.attributes["Duration"].toLowerCase().indexOf("concentration") > 0,
+        card.attributes["Duration"].toLowerCase().indexOf("concentration") >= 0,
       isUpcastable:
-        desc.indexOf("when you cast this spell using a spell slot of ") > 0,
+        desc.indexOf("when you cast this spell using a spell slot of ") >= 0,
 
       hasVerbalComponent: card.components.includes("verbal"),
       hasSomaticComponent: card.components.includes("somatic"),
       hasMaterialComponent: card.components.includes("material"),
       hasMaterialGPCost:
-        card.attributes["Materials"].toLowerCase().indexOf("worth") > 0
+        card.attributes["Materials"].toLowerCase().indexOf("worth") >= 0
     }
   };
 }
